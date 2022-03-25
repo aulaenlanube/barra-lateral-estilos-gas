@@ -1,0 +1,198 @@
+<script>
+  
+  //cantidad de estilos iniciales
+  let estiloActual = 0;
+
+  function agregarEstilo(numActual)
+  {
+    //sin parámetro
+    if(numActual == null)
+    {
+      estiloActual++;
+      numActual = estiloActual;
+    }
+
+    //creamos el div con el id del estilo
+    let div = document.createElement('div');
+    div.id = 'estilo'+numActual;   
+
+    //agregar elementos al div
+    div.appendChild(crearBotonGuardar(numActual));
+    div.appendChild(crearBotonAplicar(numActual));
+    div.appendChild(crearBotonBorrar(numActual));
+
+    //agregar el div al div donde están todos los estilos
+    document.getElementById('cajaEstilos').appendChild(div);
+
+  }
+
+  function crearBotonAplicar(numActual)
+  {
+    //boton aplicar estilo
+    let boton = document.createElement('button');
+    boton.classList.add('btn','btn-primary','m-2','boton'+numActual);
+    boton.style.borderWidth = '0px';
+    boton.textContent = 'Aplicar estilo';        
+    boton.onclick = () => aplicarEstiloActual(numActual);
+
+    //devolvemos el botón
+    return boton;
+  }
+
+  function crearBotonGuardar(numActual)
+  {
+    //boton guardar estilo
+    let botonPlus = document.createElement('button');
+    botonPlus.classList.add('btn','btn-primary','boton'+numActual);    
+    botonPlus.style.borderWidth = '0px';    
+    botonPlus.onclick = () => guardarEstiloActual(numActual);
+
+    //icono +
+    let iconoPlus = document.createElement('i');
+    iconoPlus.classList.add('bi','bi-plus-circle');
+
+    //agregar icono
+    botonPlus.appendChild(iconoPlus);
+
+    //devolvemos el botón
+    return botonPlus;
+  }
+
+  function crearBotonBorrar(numActual)
+  {
+    //boton borrar estilo
+    let botonBorrar  = document.createElement('button');
+    botonBorrar.classList.add('btn','btn-primary','boton'+numActual);  
+    botonBorrar.style.borderWidth = '0px';       
+    botonBorrar.onclick = () => borrarEstiloActual(numActual);
+
+    //icono borrar
+    let iconoBorrar = document.createElement('i');
+    iconoBorrar.classList.add('bi','bi-trash');
+
+    //agregar icono
+    botonBorrar.appendChild(iconoBorrar);
+
+    //devolvemos el botón
+    return botonBorrar;
+  }
+  
+  function aplicarEstiloActual(numActual)
+  {
+    google.script.run.aplicarEstilo(numActual);
+  }
+
+  function borrarEstiloActual(numActual)
+  {
+    document.getElementById('estilo'+numActual).remove();
+    google.script.run.eliminarEstilo(numActual);
+  }
+
+  function guardarEstiloActual(numActual)
+  { 
+    google.script.run.withSuccessHandler(
+    function(obj)
+    {       
+        let botones = document.getElementsByClassName('boton'+numActual);
+        Array.from(botones).forEach(boton => {
+          boton.style.color = obj.colorLetra;
+          boton.style.backgroundColor = obj.colorFondo; 
+
+          //borde sup
+          boton.style.borderTopColor = obj.BordeSupCO;
+          boton.style.borderTopStyle = ObtenerEstiloBorde(obj.BordeSupST);
+          boton.style.borderTopWidth = ObtenerGrosorBorde(obj.BordeSupST);
+
+          //borde inf
+          boton.style.borderBottomColor = obj.BordeInfCO;
+          boton.style.borderBottomStyle = ObtenerEstiloBorde(obj.BordeInfST);
+          boton.style.borderBottomWidth = ObtenerGrosorBorde(obj.BordeInfST);
+
+          //borde izq
+          boton.style.borderLeftColor = obj.BordeIzqCO;
+          boton.style.borderLeftStyle = ObtenerEstiloBorde(obj.BordeIzqST);
+          boton.style.borderLeftWidth = ObtenerGrosorBorde(obj.BordeIzqST);
+
+          //borde der
+          boton.style.borderRightColor = obj.BordeDerCO;
+          boton.style.borderRightStyle = ObtenerEstiloBorde(obj.BordeDerST);
+          boton.style.borderRightWidth = ObtenerGrosorBorde(obj.BordeDerST);
+        });
+    }).guardarEstilo(numActual);
+  }
+
+
+  window.onload = function()
+  {
+    google.script.run.withSuccessHandler(
+      function(obj)
+      {  
+        Object.keys(obj).sort().forEach(propiedad => {
+
+          //guardamos el número del estilo y lo agregamos
+          let num = propiedad.slice(10);
+          if(!document.getElementById('estilo'+num)) agregarEstilo(num);
+
+          //actualizamos el número del estilo actual, para quedarnos siempre con el máximo
+          if(num > estiloActual) estiloActual = num;
+
+          //aplicamos los estilos
+          aplicarEstilos(propiedad,obj);
+        })             
+      }).cargarEstilos();
+  }
+
+  function aplicarEstilos(propiedad,obj)
+  {
+    //guardamos los botones del estilo actual
+    let botones = document.getElementsByClassName('boton'+propiedad.slice(10));
+
+    switch(propiedad.slice(0,10))
+    {
+      case 'colorFondo': Array.from(botones).forEach(boton => boton.style.backgroundColor = obj[propiedad]); break;
+      case 'colorLetra': Array.from(botones).forEach(boton => boton.style.color = obj[propiedad]); break;
+      case 'BordeSupCO': Array.from(botones).forEach(boton => boton.style.borderTopColor = obj[propiedad]); break;
+      case 'BordeDerCO': Array.from(botones).forEach(boton => boton.style.borderRightColor = obj[propiedad]); break;
+      case 'BordeIzqCO': Array.from(botones).forEach(boton => boton.style.borderLeftColor = obj[propiedad]); break;
+      case 'BordeInfCO': Array.from(botones).forEach(boton => boton.style.borderBottomColor = obj[propiedad]); break;
+      case 'BordeSupST': Array.from(botones).forEach(boton => { boton.style.borderTopStyle = ObtenerEstiloBorde(obj[propiedad]);
+                                                                boton.style.borderTopWidth = ObtenerGrosorBorde(obj[propiedad])}); break;        
+      case 'BordeInfST': Array.from(botones).forEach(boton => { boton.style.borderBottomStyle = ObtenerEstiloBorde(obj[propiedad]);
+                                                                boton.style.borderBottomWidth = ObtenerGrosorBorde(obj[propiedad])}); break;      
+      case 'BordeIzqST': Array.from(botones).forEach(boton => { boton.style.borderLeftStyle = ObtenerEstiloBorde(obj[propiedad]);
+                                                                boton.style.borderLeftWidth = ObtenerGrosorBorde(obj[propiedad])}); break;      
+      case 'BordeDerST': Array.from(botones).forEach(boton => { boton.style.borderRightStyle = ObtenerEstiloBorde(obj[propiedad]);
+                                                                boton.style.borderRightWidth = ObtenerGrosorBorde(obj[propiedad])}); break;
+    }                       
+  }
+
+  function ObtenerGrosorBorde(borde)
+  {
+    switch(borde)
+    {
+      case 'DOTTED': return 'medium';
+      case 'DASHED':  return 'medium';
+      case 'SOLID':  return 'thin';
+      case 'SOLID_MEDIUM': return 'medium';
+      case 'SOLID_THICK': return 'thick';
+      case 'DOUBLE':  return 'medium';
+      default: return 'none';
+    }
+  }
+
+  function ObtenerEstiloBorde(borde)
+  {
+    switch(borde)
+    {
+      case 'DOTTED': return 'dotted';
+      case 'DASHED':  return 'dashed';
+      case 'SOLID':  return 'solid';
+      case 'SOLID_MEDIUM': return 'solid';
+      case 'SOLID_THICK': return 'solid';
+      case 'DOUBLE':  return 'double';
+      default: return 'none';
+    }
+  }
+
+  </script>
+    

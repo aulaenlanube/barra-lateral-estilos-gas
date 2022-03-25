@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <!-- ARCHIVO CSS -->
+    <?!= HtmlService.createHtmlOutputFromFile('Stylesheet').getContent();   ?>
+  </head>
+  <body>
+
+    <img class="img-fluid p-3" src="https://aulaenlanube.com/wp-content/uploads/2021/03/Logo-CABECERA-web-1.png">
+    <div class="d-flex flex-column m-2 align-items-center">
+
+      <!-- CAJA CON TODOS LOS ESTILOS -->
+      <div id="cajaEstilos">
+      </div>      
+      
+      <!-- Botones borrar -->
+      <div class="mt-5">
+        <button class="btn btn-success" onclick="agregarEstilo()"><i class="bi bi-plus-circle"></i></button>
+        <button class="btn btn-warning" onclick="google.script.run.borrarEstilos()">Borrar estilos</button>
+        <button class="btn btn-danger" onclick="google.script.run.borrarTodo()"><i class="bi bi-trash"></i></button>
+      </div>      
+      
+    </div>
+
+    <!-- ARCHIVO JS -->
+    <?!= HtmlService.createHtmlOutputFromFile('JavaScript').getContent();   ?>
+  </body>
+</html>
